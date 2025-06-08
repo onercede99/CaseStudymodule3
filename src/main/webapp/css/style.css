@@ -1,0 +1,387 @@
+/* webapp/css/style.css */
+body {
+    font-family: 'Arial', sans-serif; /* Hoặc một font chữ đẹp hơn như 'Roboto', 'Open Sans' */
+    background-color: #f8f9fa; /* Màu nền nhẹ nhàng chung */
+    /* QUAN TRỌNG: padding-top để nội dung không bị navbar fixed-top che khuất */
+    padding-top: 70px; /* Điều chỉnh giá trị này cho phù hợp với chiều cao thực tế của navbar */
+    display: flex; /* Cho phép footer dính xuống cuối trang nếu nội dung ngắn */
+    flex-direction: column; /* Cho phép footer dính xuống cuối trang */
+    min-height: 100vh; /* Cho phép footer dính xuống cuối trang */
+}
+
+/* --- Navbar Styles --- */
+.navbar-brand {
+    font-weight: bold;
+    font-size: 1.5rem; /* Tăng kích thước chữ cho thương hiệu */
+}
+.navbar-brand i.fa-hotel {
+    font-size: 1.7rem; /* Kích thước icon trong navbar */
+    margin-right: 10px; /* Khoảng cách icon với text */
+    vertical-align: middle; /* Căn giữa icon với text */
+}
+.navbar .nav-link {
+    font-weight: 500;
+}
+.navbar .nav-link i {
+    margin-right: 5px;
+}
+.navbar .nav-link.active {
+    font-weight: bold; /* Làm nổi bật link active */
+}
+
+/* --- Hero Section Styles --- */
+.hero-section {
+    background-image: url('../images/hero-background.jpg'); /* Đảm bảo đường dẫn này đúng */
+    background-size: cover;
+    background-position: center;
+    color: white;
+    padding: 120px 0; /* Tăng padding để có không gian */
+    text-align: center;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 85vh; /* Chiều cao tối thiểu lớn hơn chút */
+}
+
+.hero-section::before { /* Lớp phủ mờ */
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* Điều chỉnh độ mờ */
+    z-index: 1;
+}
+
+.hero-section .container-hero-content { /* Đổi tên class để rõ ràng hơn */
+    position: relative;
+    z-index: 2;
+}
+
+.hero-section h1 {
+    font-size: 3.8rem; /* Tăng kích thước chữ */
+    font-weight: bold;
+    text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.7);
+    margin-bottom: 0.75rem;
+}
+
+.hero-section p.lead-text {
+    font-size: 1.35rem; /* Tăng kích thước chữ */
+    margin-bottom: 35px;
+    text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.7);
+    max-width: 750px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* --- Search Form Container (trong Hero) --- */
+.hero-section .search-form-container {
+    background-color: rgba(255, 255, 255, 0.25); /* Nền mờ hơn cho form trong hero */
+    padding: 30px;
+    border-radius: 12px; /* Bo góc nhiều hơn */
+    box-shadow: 0 5px 25px rgba(0, 0, 0, 0.3);
+    max-width: 950px;
+    width: 100%;
+    margin: 25px auto 0;
+}
+
+.hero-section .search-form-container label {
+    font-weight: 500;
+    color: #f0f0f0; /* Chữ sáng màu trên nền tối/mờ */
+    margin-bottom: 0.4rem;
+    font-size: 0.95rem;
+    display: block;
+    text-align: left;
+}
+
+.hero-section .search-form-container .form-control,
+.hero-section .search-form-container .form-select {
+    background-color: rgba(255, 255, 255, 0.9); /* Input nền sáng hơn chút */
+    border: 1px solid #ced4da;
+    border-radius: 6px;
+    height: 48px; /* Chiều cao input */
+}
+.hero-section .search-form-container .btn-warning {
+    background-color: #ffc107;
+    border-color: #ffc107;
+    color: #212529;
+    font-weight: bold;
+    height: 48px; /* Đồng bộ chiều cao */
+    transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+}
+.hero-section .search-form-container .btn-warning:hover {
+    background-color: #e0a800;
+    border-color: #d39e00;
+    transform: translateY(-2px);
+}
+.hero-section .search-form-container .btn-warning i {
+    margin-right: 6px;
+}
+
+/* --- Nút Xem tất cả phòng (trong Hero) --- */
+.view-all-rooms-btn {
+    background-color: #17a2b8; /* Màu info của Bootstrap hoặc màu tùy chỉnh */
+    color: white;
+    padding: 14px 35px; /* Tăng padding */
+    font-size: 1.15rem;
+    font-weight: 500;
+    border-radius: 50px;
+    text-decoration: none;
+    transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+    display: inline-block;
+    margin-top: 30px;
+    border: none; /* Bỏ border nếu không cần */
+}
+.view-all-rooms-btn:hover {
+    background-color: #138496; /* Màu info đậm hơn */
+    color: white;
+    transform: translateY(-3px) scale(1.03);
+    box-shadow: 0 6px 15px rgba(23, 162, 184, 0.4);
+}
+.view-all-rooms-btn i {
+    margin-right: 10px;
+}
+
+/* --- Content Section Wrapper --- */
+.content-sections-wrapper {
+    background-color: #ffffff; /* Nền trắng cho các section nội dung */
+    flex-grow: 1; /* Cho phép footer dính xuống cuối trang */
+}
+
+/* --- Section Title --- */
+.section-title {
+    text-align: center;
+    margin-bottom: 50px;
+    font-size: 2.6rem; /* Điều chỉnh kích thước */
+    font-weight: 700;
+    color: #343a40;
+    position: relative;
+    padding-bottom: 20px; /* Tăng padding cho gạch chân */
+}
+
+.section-title::after {
+    content: '';
+    position: absolute;
+    display: block;
+    width: 80px;
+    height: 4px;
+    background: #007bff; /* Bootstrap primary color */
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    border-radius: 2px;
+}
+
+/* --- Hotel Card Styles --- */
+.hotel-card {
+    border: 1px solid #e9ecef; /* Border nhẹ nhàng */
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08); /* Shadow nhẹ hơn */
+    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+    margin-bottom: 30px;
+    background-color: #fff;
+    display: flex; /* Cho phép card body dãn full chiều cao */
+    flex-direction: column; /* Cho phép card body dãn full chiều cao */
+}
+
+.hotel-card:hover {
+    transform: translateY(-10px) scale(1.02);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
+}
+
+.hotel-card .card-img-top {
+    width: 100%;
+    height: 240px; /* Điều chỉnh chiều cao ảnh */
+    object-fit: cover;
+    transition: transform 0.3s ease-in-out;
+}
+.hotel-card:hover .card-img-top {
+    transform: scale(1.05);
+}
+
+.hotel-card .card-body {
+    padding: 20px;
+    display: flex; /* Cho phép nút dính xuống cuối card */
+    flex-direction: column; /* Cho phép nút dính xuống cuối card */
+    flex-grow: 1; /* Cho phép card body dãn full chiều cao */
+}
+
+.hotel-card .card-title {
+    font-size: 1.35rem; /* Điều chỉnh kích thước */
+    font-weight: 600;
+    color: #0069d9; /* Màu primary đậm hơn */
+    margin-bottom: 0.6rem;
+}
+.hotel-card .card-text {
+    color: #495057; /* Màu chữ dễ đọc */
+    font-size: 0.92rem;
+    line-height: 1.6;
+    margin-bottom: 1rem; /* Khoảng cách với nút */
+    flex-grow: 1; /* Đẩy nút xuống cuối */
+}
+.hotel-card .btn-primary {
+    background-color: #007bff;
+    border-color: #007bff;
+    font-weight: 500;
+    padding: 0.5rem 1rem; /* Điều chỉnh padding nút */
+    margin-top: auto; /* Đẩy nút xuống cuối card */
+    align-self: flex-start; /* Căn nút sang trái */
+}
+.hotel-card .btn-primary:hover {
+    background-color: #0056b3;
+    border-color: #004085;
+}
+.hotel-card .btn-primary i {
+    margin-right: 5px;
+}
+
+/* --- Destination Card Styles (tái sử dụng .hotel-card) --- */
+.destination-card .card-img-top {
+    height: 280px; /* Ảnh điểm đến có thể cao hơn */
+}
+.destination-card .card-title {
+    color: #343a40; /* Màu tiêu đề điểm đến */
+}
+
+
+/* --- Why Us Section --- */
+#why-us {
+    background-color: #eef3f7; /* Màu nền khác biệt chút */
+}
+#why-us .feature-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    display: inline-block; /* Để màu nền icon tròn hoạt động (nếu có) */
+    /* width: 70px; */ /* Ví dụ nếu muốn icon có nền tròn */
+    /* height: 70px; */
+    /* line-height: 70px; */
+    /* border-radius: 50%; */
+    /* background-color: rgba(0, 123, 255, 0.1); */ /* Màu nền nhẹ cho icon */
+}
+#why-us h4 {
+    font-size: 1.3rem;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+    color: #2c3e50; /* Màu tiêu đề đậm hơn */
+}
+#why-us p.text-muted {
+    font-size: 0.95rem;
+    line-height: 1.6;
+}
+
+/* --- Footer Styles --- */
+.footer-main { /* Đổi tên class để tránh xung đột */
+    background-color: #2c3e50; /* Màu xanh navy đậm */
+    color: #bdc3c7; /* Màu chữ xám nhạt */
+    padding: 50px 0 30px; /* Thêm padding dưới */
+    text-align: center;
+}
+.footer-main p {
+    margin-bottom: 0.6rem;
+    font-size: 0.9rem;
+}
+.footer-main a {
+    color: #f1c40f; /* Màu vàng cho link */
+    text-decoration: none;
+    transition: color 0.2s ease-in-out;
+}
+.footer-main a:hover {
+    color: #f39c12; /* Vàng đậm hơn khi hover */
+    text-decoration: underline;
+}
+.footer-main .social-icons a {
+    color: #ecf0f1; /* Màu trắng nhạt cho icon social */
+    font-size: 1.3rem; /* Kích thước icon */
+    margin: 0 10px; /* Khoảng cách giữa các icon */
+    transition: color 0.2s ease, transform 0.2s ease;
+}
+.footer-main .social-icons a:hover {
+    color: #f1c40f;
+    transform: scale(1.1);
+}
+
+/* --- Search Bar (trong header) --- */
+.search-bar-custom {
+    background-color: #ffffff; /* Nền trắng cho search bar */
+    padding: 20px 0; /* Giảm padding một chút */
+    margin-bottom: 25px; /* Điều chỉnh khoảng cách */
+    border-radius: 0.5rem; /* Bo góc ít hơn */
+    box-shadow: 0 4px 15px rgba(0,0,0,.08); /* Shadow nhẹ hơn */
+}
+.search-bar-custom .form-control,
+.search-bar-custom .form-select,
+.search-bar-custom .btn {
+    height: 48px; /* Đồng bộ chiều cao */
+    font-size: 0.95rem; /* Giảm font chữ một chút */
+}
+.search-bar-custom label {
+    font-weight: 500;
+    margin-bottom: 0.3rem;
+    font-size: 0.85rem; /* Giảm font chữ label */
+    color: #495057; /* Màu chữ đậm hơn */
+}
+.search-bar-custom .btn-warning {
+    font-weight: bold;
+    text-transform: uppercase;
+}
+.search-bar-custom .btn-warning i {
+    margin-right: 5px;
+}
+
+/* --- Alert Messages --- */
+.alert i {
+    margin-right: 8px; /* Icon cho alert */
+}
+
+/* Responsive adjustments */
+@media (max-width: 991px) { /* Tablet và nhỏ hơn */
+    .hero-section h1 {
+        font-size: 2.8rem;
+    }
+    .hero-section p.lead-text {
+        font-size: 1.15rem;
+    }
+    .hero-section .search-form-container {
+        padding: 20px;
+    }
+    .hero-section .search-form-container .col-lg-2,
+    .hero-section .search-form-container .col-lg-4 {
+        margin-bottom: 1rem; /* Khoảng cách giữa các input trên tablet */
+    }
+}
+
+@media (max-width: 767px) {
+    body {
+        padding-top: 56px;
+    }
+    .hero-section {
+        padding: 80px 0;
+        min-height: 70vh;
+    }
+    .hero-section h1 {
+        font-size: 2.2rem;
+    }
+    .hero-section p.lead-text {
+        font-size: 1rem;
+    }
+    .section-title {
+        font-size: 2rem;
+    }
+    .hotel-card .card-title {
+        font-size: 1.2rem;
+    }
+    .hotel-card .card-text {
+        min-height: auto;
+    }
+    .search-bar-custom .col-md-2, .search-bar-custom .col-md-4 {
+        margin-bottom: 0.75rem;
+    }
+    .search-bar-custom .btn {
+        padding-left: 0.5rem;
+        padding-right: 0.5rem;
+    }
+}
