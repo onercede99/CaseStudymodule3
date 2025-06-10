@@ -26,8 +26,22 @@ public class BookingServlet extends HttpServlet {
 
     @Override
     public void init() {
-        roomService = new RoomServiceImpl();
-        bookingService = new BookingServiceImpl();
+        System.out.println("BookingServlet: init() called.");
+
+        BookingServiceImpl tempBookingService = new BookingServiceImpl();
+        RoomServiceImpl tempRoomService = new RoomServiceImpl();
+
+        tempBookingService.setRoomService(tempRoomService);
+        tempRoomService.setBookingService(tempBookingService);
+
+        this.roomService = tempRoomService;
+        this.bookingService = tempBookingService;
+
+        if (this.roomService != null && this.bookingService != null) {
+            System.out.println("BookingServlet: roomService and bookingService initialized.");
+        } else {
+            System.err.println("BookingServlet: FAILED to initialize services.");
+        }
     }
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException{
@@ -77,6 +91,7 @@ public class BookingServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         Room room = null;
         try {
+            System.out.println("--- BookingServlet - doPost START ---");
             request.setCharacterEncoding("UTF-8");
             int roomId = Integer.parseInt(request.getParameter("roomId"));
             String guestName = request.getParameter("guestName");
@@ -123,9 +138,13 @@ public class BookingServlet extends HttpServlet {
                 return;
             }
             long numberOfNights = BookingServiceImpl.calculateNights(checkInDateLocal, checkOutDateLocal);
-            if(numberOfNights <= 0){
+            if(numberOfNights < 1){
                 request.setAttribute("errorMessage", "Số đêm phải lớn hơn 0.");
                 request.setAttribute("room", room);
+                request.setAttribute("guestName", guestName);
+                request.setAttribute("guestEmail", guestEmail);
+                request.setAttribute("checkInDate", checkInStr);
+                request.setAttribute("checkOutDate", checkOutStr);
                 request.getRequestDispatcher("/WEB-INF/views/booking_form.jsp").forward(request, response);
                 return;
             }
@@ -140,12 +159,31 @@ public class BookingServlet extends HttpServlet {
             booking.setStatus("confirmed");
             boolean success = bookingService.createBooking(booking);
             if(success){
+                System.out.println("--- BookingServlet - doPost - Booking SUCCESS ---");
+                System.out.println("Forwarding to confirmation page.");
+                System.out.println("Booking Details from Servlet: ID=" + booking.getBookingId() +
+                        ", Guest=" + booking.getGuestName() +
+                        ", RoomID=" + booking.getRoomId() +
+                        ", CheckIn=" + booking.getCheckInDate() +
+                        ", CheckOut=" + booking.getCheckOutDate() +
+                        ", TotalPrice=" + booking.getTotalPrice() +
+                        ", Status=" + booking.getStatus());
+
+                System.out.println("Room Details from Servlet: ID=" + room.getRoomId() +
+                        ", Number=" + room.getRoomNumber() +
+                        ", Type=" + room.getRoomType() +
+                        ", Price=" + room.getPricePerNight());
+                System.out.println("--- End Debug Log ---");
+
+
                 request.setAttribute("booking", booking);
                 request.setAttribute("room", room);
+
                 request.getRequestDispatcher("/WEB-INF/views/booking_confirmation.jsp").forward(request, response);
                 return;
             } else {
                 request.setAttribute("errorMessage", "Không thể tạo đặt phòng. Có thể phòng vừa được đặt hoặc có lỗi hệ thống.");
+                 request.setAttribute("booking", booking);
                 request.setAttribute("room", room);
                 request.setAttribute("guestName", guestName);
                 request.setAttribute("guestEmail", guestEmail);
@@ -153,7 +191,6 @@ public class BookingServlet extends HttpServlet {
                 request.setAttribute("checkOutDate", checkOutStr);
                 request.getRequestDispatcher("/WEB-INF/views/booking_form.jsp").forward(request, response);
                 return;
-
             }
 
         } catch (NumberFormatException e) {

@@ -59,7 +59,7 @@
                 <button type="submit" class="btn btn-success btn-lg fw-bold py-3 text-uppercase">
                     <i class="bi bi-check-circle-fill"></i> Xác nhận và đặt phòng
                 </button>
-                <a href="${pageContext.request.contextPath}/rooms" class="btn btn-outline-secondary btn-lg py-3">
+                <a href="${pageContext.request.contextPath}/room_list" class="btn btn-outline-secondary btn-lg py-3">
                     <i class="bi bi-arrow-left-circle"></i> Hủy và quay lại
                 </a>
             </div>

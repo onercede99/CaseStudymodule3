@@ -1,5 +1,6 @@
 package com.example.casestudy.controller;
 
+import com.example.casestudy.Service.BookingServiceImpl;
 import com.example.casestudy.Service.RoomService;
 import com.example.casestudy.Service.RoomServiceImpl;
 import com.example.casestudy.model.Room;
@@ -20,7 +21,14 @@ public class AdminRoomServlet extends HttpServlet {
 
     @Override
     public void init() throws ServletException {
-        roomService = new RoomServiceImpl();
+        BookingServiceImpl tempBookingService = new BookingServiceImpl();
+        RoomServiceImpl tempRoomService = new RoomServiceImpl();
+
+        tempBookingService.setRoomService(tempRoomService);
+        tempRoomService.setBookingService(tempBookingService);
+
+        this.roomService = tempRoomService;
+
     }
 
     @Override
@@ -61,6 +69,7 @@ public class AdminRoomServlet extends HttpServlet {
             throw new ServletException("Lỗi không xác định: " + e.getMessage(), e);
         }
     }
+
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         request.setCharacterEncoding("UTF-8");
@@ -69,129 +78,67 @@ public class AdminRoomServlet extends HttpServlet {
 
         String action = request.getParameter("action");
 
-        if (!"insert".equals(action) && !"update".equals(action)) {
-            response.sendRedirect(request.getContextPath() + "/admin/rooms?error=invalidAction");
-            return;
-        }
-
-        // Lấy các tham số từ request
-        String roomNumber = request.getParameter("roomNumber");
-        String pricePerNightStr = request.getParameter("pricePerNight");
-        String roomType = request.getParameter("roomType"); // Thêm trường này nếu có
-        String description = request.getParameter("description");
-        String isAvailableStr = request.getParameter("isAvailable");
-        boolean isAvailable = "on".equals(isAvailableStr);
-
-        Room room = new Room();
-
-        if ("update".equals(action)) {
-            try {
-                int id = Integer.parseInt(request.getParameter("id"));
-                room = roomService.getRoomById(id);
-                if (room == null) {
-                    response.sendRedirect(request.getContextPath() + "/admin/rooms?error=notFoundOnUpdate");
-                    return;
-                }
-            } catch (NumberFormatException e) {
-                response.sendRedirect(request.getContextPath() + "/admin/rooms?error=invalidIdOnUpdate");
-                return;
-            } catch (SQLException e) {
-                e.printStackTrace();
-                try {
-                    listRoomsAndShowError(request, response, "Lỗi cơ sở dữ liệu khi lấy phòng để cập nhật.");
-                } catch (SQLException ex) {
-                    throw new RuntimeException(ex);
-                }
-                return;
-            }
-        }
-
-
-        room.setRoomNumber(roomNumber);
-        room.setRoomType(roomType);
-        room.setDescription(description);
-
-        room.setAvailable(isAvailable);
-
-
-        if (roomNumber == null || roomNumber.trim().isEmpty()) {
-            request.setAttribute("errorMessage", "Số phòng không được để trống.");
-            loadFormAttributesAndForward(request, response, room, action);
-            return;
-        }
-
-        if (roomType == null || roomType.trim().isEmpty()) {
-            request.setAttribute("errorMessage", "Kiểu phòng không được để trống.");
-            loadFormAttributesAndForward(request, response, room, action);
-            return;
-        }
-
-        BigDecimal pricePerNight;
-        if (pricePerNightStr == null || pricePerNightStr.trim().isEmpty()) {
-            request.setAttribute("errorMessage", "Giá mỗi đêm không được để trống.");
-            loadFormAttributesAndForward(request, response, room, action);
-            return;
-        }
         try {
-            pricePerNight = new BigDecimal(pricePerNightStr.replace(",", "")); // Loại bỏ dấu phẩy nếu có
-            if (pricePerNight.compareTo(BigDecimal.ZERO) < 0) {
-                request.setAttribute("errorMessage", "Giá mỗi đêm không được là số âm.");
-                loadFormAttributesAndForward(request, response, room, action);
-                return;
-            }
-            room.setPricePerNight(pricePerNight);
-        } catch (NumberFormatException e) {
-            request.setAttribute("errorMessage", "Giá mỗi đêm không hợp lệ. Vui lòng nhập số.");
-            if (!"update".equals(action)) room.setPricePerNight(null);
-            loadFormAttributesAndForward(request, response, room, action);
-            return;
-        }
-
-
-        try {
-            boolean success;
-            String successActionMessage = "";
-            String successRedirectParam = "";
-
             if ("insert".equals(action)) {
-                success = roomService.addRoom(room);
-                successActionMessage = "Thêm phòng";
-                successRedirectParam = "added";
+                processInsertRoom(request, response);
+            } else if ("update".equals(action)) {
+                processUpdateRoom(request, response); // Gọi phương thức xử lý update
             } else {
-                success = roomService.updateRoom(room);
-                successActionMessage = "Cập nhật phòng";
-                successRedirectParam = "updated";
-            }
-
-            if (success) {
-                response.sendRedirect(request.getContextPath() + "/admin/rooms?successMessage=" + successRedirectParam);
-            } else {
-                request.setAttribute("errorMessage", successActionMessage + " thất bại. Cơ sở dữ liệu không có thay đổi.");
-                loadFormAttributesAndForward(request, response, room, action);
+                System.out.println("AdminRoomServlet - doPost - Invalid action: " + action); // Log action không hợp lệ
+                response.sendRedirect(request.getContextPath() + "/admin/rooms?error=invalidAction");
             }
         } catch (SQLException e) {
             e.printStackTrace();
-            String specificErrorMessage = "Lỗi cơ sở dữ liệu: ";
-            if (e.getMessage().toLowerCase().contains("duplicate entry")) {
-                if (e.getMessage().toLowerCase().contains("room_number_unique") || e.getMessage().toLowerCase().contains("'rooms.room_number'")) { // Tên constraint/cột tùy DB
-                    specificErrorMessage += "Số phòng '" + room.getRoomNumber() + "' đã tồn tại.";
+            String errorMessage = "Lỗi cơ sở dữ liệu: " + e.getMessage();
+            if (e.getMessage() != null && e.getMessage().toLowerCase().contains("duplicate entry")) {
+                if (e.getMessage().toLowerCase().contains("room_number")) { // Giả sử có constraint tên 'room_number_unique' hoặc cột 'room_number'
+                    errorMessage = "Số phòng '" + request.getParameter("roomNumber") + "' đã tồn tại.";
                 } else {
-                    specificErrorMessage += "Dữ liệu bị trùng lặp.";
+                    errorMessage = "Dữ liệu bị trùng lặp.";
                 }
-            } else {
-                specificErrorMessage += e.getMessage();
             }
-            request.setAttribute("errorMessage", specificErrorMessage);
-            loadFormAttributesAndForward(request, response, room, action);
+
+            Room roomForForm = new Room();
+            if ("update".equals(action) && request.getParameter("id") != null) {
+                try {
+                    roomForForm.setRoomId(Integer.parseInt(request.getParameter("id")));
+                } catch (NumberFormatException nfe) {  }
+            }
+            roomForForm.setRoomNumber(request.getParameter("roomNumber"));
+            roomForForm.setRoomType(request.getParameter("roomType"));
+            roomForForm.setDescription(request.getParameter("description"));
+            try {
+                if (request.getParameter("capacity") != null && !request.getParameter("capacity").isEmpty()) {
+                    roomForForm.setCapacity(Integer.parseInt(request.getParameter("capacity")));
+                }
+                if (request.getParameter("pricePerNight") != null && !request.getParameter("pricePerNight").isEmpty()) {
+                    roomForForm.setPricePerNight(new BigDecimal(request.getParameter("pricePerNight").replace(",", "")));
+                }
+            } catch (NumberFormatException nfe) {  }
+            roomForForm.setAvailable("on".equals(request.getParameter("isAvailable")));
+
+            request.setAttribute("errorMessage", errorMessage);
+            loadFormAttributesAndForward(request, response, roomForForm, action != null ? action : "list"); // action có thể null nếu vào đây từ exception khác
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            request.setAttribute("errorMessage", "Đã có lỗi không mong muốn xảy ra: " + e.getMessage());
+            try {
+                listRoomsAndShowError(request, response, "Đã có lỗi không mong muốn xảy ra.");
+            } catch (SQLException exSQL) {
+                throw new ServletException("Lỗi nghiêm trọng khi xử lý request và cả khi hiển thị danh sách phòng.", exSQL);
+            }
         }
     }
-
-
-
-
-
     private void listRooms(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException, SQLException {
+        System.out.println("AdminRoomServlet - listRooms - Calling roomService.getAllRooms()");
         List<Room> listRoom = roomService.getAllRooms();
+        System.out.println("AdminRoomServlet - listRooms - Number of rooms retrieved: " + (listRoom != null ? listRoom.size() : "null"));
+        if (listRoom != null && !listRoom.isEmpty()) {
+            for (Room r : listRoom) {
+                System.out.println("AdminRoomServlet - listRooms - Room ID: " + r.getRoomId() + ", isAvailable (for display): " + r.isAvailable());
+            }
+        }
         request.setAttribute("listRoom", listRoom);
 
         String successMessageKey = request.getParameter("successMessage");
@@ -240,39 +187,224 @@ public class AdminRoomServlet extends HttpServlet {
         }
     }
 
-    private void insertRoom(HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException {
-        String roomNumber = request.getParameter("roomNumber");
-        BigDecimal price = new BigDecimal(request.getParameter("pricePerNight"));
-        String description = request.getParameter("description");
-        boolean isAvailable = "on".equalsIgnoreCase(request.getParameter("isAvailable"));
+    private void processInsertRoom(HttpServletRequest request, HttpServletResponse response)
+            throws IOException, SQLException, ServletException {
 
+        System.out.println("AdminRoomServlet - processInsertRoom - Called.");
+
+        String roomNumber = request.getParameter("roomNumber");
+        String pricePerNightStr = request.getParameter("pricePerNight");
+        String roomType = request.getParameter("roomType");
+        String description = request.getParameter("description");
+        String isAvailableStr = request.getParameter("isAvailable");
+        boolean isAvailable = "on".equals(isAvailableStr);
+        String capacityStr = request.getParameter("capacity");
+
+        String imageUrl = request.getParameter("imageUrl");
+        System.out.println("AdminRoomServlet - processInsertRoom - Image URL from form: [" + imageUrl + "]");
 
         Room newRoom = new Room();
-        newRoom.setRoomNumber(roomNumber);
-        newRoom.setPricePerNight(price);
-        newRoom.setDescription(description);
         newRoom.setAvailable(isAvailable);
+        String relativeImagePath = null;
 
-        roomService.addRoom(newRoom);
-        response.sendRedirect(request.getContextPath() + "/admin/rooms?success=add");
+
+        newRoom.setImageUrl(relativeImagePath);
+
+        if (imageUrl != null && !imageUrl.trim().isEmpty()) {
+            newRoom.setImageUrl(imageUrl.trim());
+        } else {
+            newRoom.setImageUrl(null);
+        }
+
+
+        if (roomNumber == null || roomNumber.trim().isEmpty()) {
+            request.setAttribute("errorMessage", "Số phòng không được để trống.");
+            newRoom.setRoomType(roomType);
+            newRoom.setDescription(description);
+            loadFormAttributesAndForward(request, response, newRoom, "insert");
+            return;
+        }
+        newRoom.setRoomNumber(roomNumber);
+
+        if (roomType == null || roomType.trim().isEmpty()) {
+            request.setAttribute("errorMessage", "Kiểu phòng không được để trống.");
+            loadFormAttributesAndForward(request, response, newRoom, "insert");
+            return;
+        }
+        newRoom.setRoomType(roomType);
+
+        if (roomService.checkRoomNumberExists(newRoom.getRoomNumber())) {
+            System.out.println("AdminRoomServlet - processInsertRoom - Room number already exists: " + newRoom.getRoomNumber());
+            request.setAttribute("errorMessage", "Số phòng '" + newRoom.getRoomNumber() + "' đã tồn tại. Vui lòng chọn số phòng khác.");
+            loadFormAttributesAndForward(request, response, newRoom, "insert");
+            return;
+        }
+
+        if (capacityStr == null || capacityStr.trim().isEmpty()) {
+            request.setAttribute("errorMessage", "Sức chứa không được để trống.");
+            loadFormAttributesAndForward(request, response, newRoom, "insert");
+            return;
+        }
+        try {
+            int capacity = Integer.parseInt(capacityStr);
+            if (capacity <= 0) {
+                request.setAttribute("errorMessage", "Sức chứa phải là số dương.");
+                newRoom.setCapacity(0);
+                loadFormAttributesAndForward(request, response, newRoom, "insert");
+                return;
+            }
+            newRoom.setCapacity(capacity);
+        } catch (NumberFormatException e) {
+            request.setAttribute("errorMessage", "Sức chứa không hợp lệ.");
+            loadFormAttributesAndForward(request, response, newRoom, "insert");
+            return;
+        }
+
+        newRoom.setDescription(description);
+
+        BigDecimal pricePerNight;
+        if (pricePerNightStr == null || pricePerNightStr.trim().isEmpty()) {
+            request.setAttribute("errorMessage", "Giá mỗi đêm không được để trống.");
+            loadFormAttributesAndForward(request, response, newRoom, "insert");
+            return;
+        }
+        try {
+            pricePerNight = new BigDecimal(pricePerNightStr.replace(",", ""));
+            if (pricePerNight.compareTo(BigDecimal.ZERO) < 0) {
+                request.setAttribute("errorMessage", "Giá mỗi đêm không được là số âm.");
+                newRoom.setPricePerNight(pricePerNight);
+                loadFormAttributesAndForward(request, response, newRoom, "insert");
+                return;
+            }
+            newRoom.setPricePerNight(pricePerNight);
+        } catch (NumberFormatException e) {
+            request.setAttribute("errorMessage", "Giá mỗi đêm không hợp lệ. Vui lòng nhập số.");
+            loadFormAttributesAndForward(request, response, newRoom, "insert");
+            return;
+        }
+
+        System.out.println("AdminRoomServlet - processInsertRoom - Room to add: " + newRoom.getRoomNumber() + ", Type=" + newRoom.getRoomType() +
+                ", ImageURL=[" + newRoom.getImageUrl() + "]" );
+        boolean success = roomService.addRoom(newRoom);
+
+        if (success) {
+            System.out.println("AdminRoomServlet - processInsertRoom - Add success. Redirecting...");
+            response.sendRedirect(request.getContextPath() + "/admin/rooms?successMessage=added");
+        } else {
+            System.out.println("AdminRoomServlet - processInsertRoom - Add failed.");
+            request.setAttribute("errorMessage", "Thêm phòng thất bại. Cơ sở dữ liệu không có thay đổi hoặc số phòng đã tồn tại (nếu service không ném lỗi).");
+            loadFormAttributesAndForward(request, response, newRoom, "insert");
+        }
     }
 
-    private void updateRoom(HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException {
-        int id = Integer.parseInt(request.getParameter("id"));
-        String roomNuber = request.getParameter("roomNumber");
-        BigDecimal price = new BigDecimal(request.getParameter("pricePerNight"));
-        String description = request.getParameter("description");
-        boolean isAvailable = "on".equalsIgnoreCase(request.getParameter("isAvailable"));
+    private void processUpdateRoom(HttpServletRequest request, HttpServletResponse response)
+            throws IOException, SQLException, ServletException {
 
-        Room room = roomService.getRoomById(id);
-        if (room != null) {
-            room.setRoomNumber(roomNuber);
-            room.setPricePerNight(price);
-            room.setDescription(description);
-            room.setAvailable(isAvailable);
-            roomService.updateRoom(room);
+        System.out.println("AdminRoomServlet - processUpdateRoom - Called.");
+        int id ;
+        Room roomToUpdate;
+
+
+        try {
+            id = Integer.parseInt(request.getParameter("id"));
+            roomToUpdate = roomService.getRoomById(id);
+            if (roomToUpdate == null) {
+                System.out.println("AdminRoomServlet - processUpdateRoom - Room not found for update: " + id);
+                response.sendRedirect(request.getContextPath() + "/admin/rooms?error=notFoundOnUpdate");
+                return;
+            }
+        } catch (NumberFormatException e) {
+            System.out.println("AdminRoomServlet - processUpdateRoom - Invalid ID for update: " + request.getParameter("id"));
+            response.sendRedirect(request.getContextPath() + "/admin/rooms?error=invalidIdOnUpdate");
+            return;
         }
-        response.sendRedirect(request.getContextPath() + "/admin/rooms?success=update");
+        String roomNumber = request.getParameter("roomNumber");
+        String pricePerNightStr = request.getParameter("pricePerNight");
+        String roomType = request.getParameter("roomType");
+        String description = request.getParameter("description");
+        String isAvailableStr = request.getParameter("isAvailable");
+        boolean isAvailable = "on".equals(isAvailableStr);
+        String capacityStr = request.getParameter("capacity");
+        String newImageUrl = request.getParameter("imageUrl");
+        System.out.println("AdminRoomServlet - processUpdateRoom - New Image URL from form: [" + newImageUrl + "]");
+
+        if (newImageUrl != null && !newImageUrl.trim().isEmpty()) {
+            roomToUpdate.setImageUrl(newImageUrl.trim());
+        } else {
+            roomToUpdate.setImageUrl(null);
+        }
+        if (roomNumber == null || roomNumber.trim().isEmpty()) {
+            request.setAttribute("errorMessage", "Số phòng không được để trống.");
+
+            loadFormAttributesAndForward(request, response, roomToUpdate, "update");
+            return;
+        }
+        roomToUpdate.setRoomNumber(roomNumber);
+
+        if (roomType == null || roomType.trim().isEmpty()) {
+            request.setAttribute("errorMessage", "Kiểu phòng không được để trống.");
+            loadFormAttributesAndForward(request, response, roomToUpdate, "update");
+            return;
+        }
+        roomToUpdate.setRoomType(roomType);
+
+        if (capacityStr == null || capacityStr.trim().isEmpty()) {
+            request.setAttribute("errorMessage", "Sức chứa không được để trống.");
+            loadFormAttributesAndForward(request, response, roomToUpdate, "update");
+            return;
+        }
+        try {
+            int capacity = Integer.parseInt(capacityStr);
+            if (capacity <= 0) {
+                request.setAttribute("errorMessage", "Sức chứa phải là số dương.");
+                loadFormAttributesAndForward(request, response, roomToUpdate, "update");
+                return;
+            }
+            roomToUpdate.setCapacity(capacity);
+        } catch (NumberFormatException e) {
+            request.setAttribute("errorMessage", "Sức chứa không hợp lệ.");
+            loadFormAttributesAndForward(request, response, roomToUpdate, "update");
+            return;
+        }
+
+        roomToUpdate.setDescription(description);
+        roomToUpdate.setAvailable(isAvailable);
+
+        BigDecimal pricePerNight;
+        if (pricePerNightStr == null || pricePerNightStr.trim().isEmpty()) {
+            request.setAttribute("errorMessage", "Giá mỗi đêm không được để trống.");
+            loadFormAttributesAndForward(request, response, roomToUpdate, "update");
+            return;
+        }
+        try {
+            pricePerNight = new BigDecimal(pricePerNightStr.replace(",", ""));
+            if (pricePerNight.compareTo(BigDecimal.ZERO) < 0) {
+                request.setAttribute("errorMessage", "Giá mỗi đêm không được là số âm.");
+                roomToUpdate.setPricePerNight(pricePerNight);
+                loadFormAttributesAndForward(request, response, roomToUpdate, "update");
+                return;
+            }
+            roomToUpdate.setPricePerNight(pricePerNight);
+        } catch (NumberFormatException e) {
+            request.setAttribute("errorMessage", "Giá mỗi đêm không hợp lệ. Vui lòng nhập số.");
+            loadFormAttributesAndForward(request, response, roomToUpdate, "update");
+            return;
+        }
+
+
+        System.out.println("AdminRoomServlet - processUpdateRoom - Room to update: " +
+                "Number=" + roomToUpdate.getRoomNumber() +
+                ", New ImageURL=[" + roomToUpdate.getImageUrl() + "]");
+        boolean success = roomService.updateRoom(roomToUpdate);
+
+        if (success) {
+            System.out.println("AdminRoomServlet - processUpdateRoom - Update success. Redirecting...");
+            response.sendRedirect(request.getContextPath() + "/admin/rooms?successMessage=updated");
+        } else {
+            System.out.println("AdminRoomServlet - processUpdateRoom - Update failed.");
+            request.setAttribute("errorMessage", "Cập nhật phòng thất bại. Cơ sở dữ liệu không có thay đổi hoặc số phòng mới đã tồn tại.");
+            loadFormAttributesAndForward(request, response, roomToUpdate, "update");
+        }
     }
 
     private void deleteRoom(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException, SQLException {

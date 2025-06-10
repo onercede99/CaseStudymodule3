@@ -1,9 +1,14 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" isErrorPage="true" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 
 <c:set var="pageTitle" value="Đã xảy ra lỗi" scope="request"/>
 <jsp:include page="../../WEB-INF/jsp/common/header.jsp"/>
+<%--<html>--%>
+<%--<head>--%>
 
+<%--</head>--%>
+<%--<body>--%>
 <div class="container mt-5">
   <div class="card">
     <div class="card-header bg-success text-white">
@@ -31,8 +36,13 @@
 
         <dt class="col-sm-4">Tổng số đêm:</dt>
         <dd class="col-sm-8">
-          <c:set var="nights" value="${(booking.checkOutDate.time - booking.checkInDate.time) / (1000 * 60 * 60 * 24)}"/>
-          <fmt:formatNumber value="${nights}" minFractionDigits="0" maxFractionDigits="0"/> đêm
+           <c:if test="${not empty booking.checkInDate and not empty booking.checkOutDate}">
+            <c:set var="nights" value="${(booking.checkOutDate.time - booking.checkInDate.time) / (1000 * 60 * 60 * 24)}"/>
+             <c:if test="${nights < 1}"><c:set var="nights" value="1"/></c:if>
+             <fmt:formatNumber value="${nights}" minFractionDigits="0" maxFractionDigits="0"/> đêm
+             </c:if>
+             <c:if test="${empty booking.checkInDate or empty booking.checkOutDate}">
+              N/A </c:if>
         </dd>
 
         <dt class="col-sm-4">Tổng tiền:</dt>
@@ -48,10 +58,11 @@
       <a href="${pageContext.request.contextPath}/" class="btn btn-primary">
         <i class="bi bi-house-door"></i> Về trang chủ
       </a>
-      <a href="${pageContext.request.contextPath}/rooms" class="btn btn-secondary">
+      <a href="${pageContext.request.contextPath}/room_list" class="btn btn-secondary">
         <i class="bi bi-door-open"></i> Xem các phòng khác
       </a>
     </div>
   </div>
 </div>
+
 <jsp:include page="../../WEB-INF/jsp/common/footer.jsp"/>

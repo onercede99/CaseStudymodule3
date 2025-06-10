@@ -58,6 +58,7 @@
                                     </strong>
                                     <span class="text-muted">/ đêm</span>
                                 </p>
+                                <p class="card-text">Sức chứa: <c:out value="${room.capacity}"/> người</p>
                                 <a href="${pageContext.request.contextPath}/booking?roomId=${room.roomId}&checkInDate=${paramCheckIn}&checkOutDate=${paramCheckOut}" class="btn btn-warning w-100 fw-bold text-uppercase">
                                     Chọn phòng <i class="bi bi-chevron-right"></i>
                                 </a>

@@ -17,7 +17,6 @@
     </div>
   </c:if>
 
-  <%-- Hiển thị thông báo lỗi --%>
   <c:if test="${not empty errorAlert}">
     <div class="alert alert-danger alert-dismissible fade show" role="alert">
       <c:out value="${errorAlert}"/>
@@ -34,6 +33,12 @@
       </button>
       <div class="collapse navbar-collapse" id="adminNavbar">
         <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+          <li>
+            <hr class="nav-item">
+            <a href="${pageContext.request.contextPath}/" target="_blank">
+              <i class="fas fa-home"></i> Về Trang Chủ
+            </a>
+          </li>
           <li class="nav-item">
             <a class="nav-link active" aria-current="page" href="${pageContext.request.contextPath}/admin/rooms">Quản lý Phòng</a>
           </li>
@@ -42,7 +47,7 @@
           </li>
         </ul>
         <ul class="navbar-nav">
-          <li class="nav-item">
+          <li class="nav-item" style="align-content: center">
                          <span class="navbar-text me-3">
                              Chào, <c:out value="${sessionScope.adminUser.username}"/>!
                          </span>
@@ -79,41 +84,45 @@
     <thead>
     <tr>
       <th>ID</th>
-      <th>Tên phòng</th>
+      <th>Số phòng</th>
+      <th>Kiểu phòng</th>
       <th>Giá/đêm</th>
       <th>Sức chứa</th>
-      <th>Trạng thái</th>
       <th>Mô tả</th>
+      <th>Ảnh</th>
+      <th>Trạng thái</th>
       <th>Hành động</th>
     </tr>
     </thead>
     <tbody>
     <c:forEach var="room" items="${listRoom}">
       <tr>
-        <td>${room.roomId}</td>
+        <td><c:out value="${room.roomId}"/></td>
         <td><c:out value="${room.roomNumber}"/></td>
-        <td><fmt:formatNumber value="${room.pricePerNight}" type="currency" currencyCode="VND"/></td>
-        <td>
-          <c:choose>
-            <c:when test="${room.available}">
-              <span class="badge bg-success">Còn trống</span>
-            </c:when>
-            <c:otherwise>
-              <span class="badge bg-danger">Hết phòng / Ngừng cho thuê</span>
-            </c:otherwise>
-          </c:choose>
-        </td>
+        <td><c:out value="${room.roomType}"/></td>
+        <td><c:out value="${String.format('%,.0f đ', room.pricePerNight)}"/></td>
+        <td><c:out value="${room.capacity}"/> người</td>
         <td><c:out value="${room.description}"/></td>
         <td>
+          <c:if test="${not empty room.imageUrl}">
+            <img src="${room.imageUrl}" class="card-img-top" alt="Ảnh phòng ${room.roomNumber}"
+                 onerror="this.onerror=null; this.src='${pageContext.request.contextPath}/images/placeholder.png'; this.alt='Lỗi tải ảnh';">
+          </c:if>
+          <c:if test="${empty room.imageUrl}">
+            <img src="${pageContext.request.contextPath}/images/placeholder.png" class="card-img-top" alt="Không có ảnh">
+          </c:if>
+        </td>
+        <td>
+          <c:if test="${room.available}">
+            <span class="badge bg-success">Còn trống</span>
+          </c:if>
+          <c:if test="${not room.available}">
+            <span class="badge bg-danger">Hết phòng</span>
+          </c:if>
+        </td>
+        <td>
           <a href="${pageContext.request.contextPath}/admin/rooms?action=edit&id=${room.roomId}" class="btn btn-sm btn-primary">Sửa</a>
-          <form action="${pageContext.request.contextPath}/admin/rooms" method="POST"
-                style="display:inline;"
-                onsubmit="return true;"
-                data-confirm-message="Bạn có chắc chắn muốn xóa phòng này không? Tất cả các booking liên quan (nếu có) sẽ không bị ảnh hưởng.">
-            <input type="hidden" name="action" value="delete">
-            <input type="hidden" name="id" value="${room.roomId}">
-            <button type="submit" class="btn btn-sm btn-danger">Xóa</button>
-          </form>
+          <a href="${pageContext.request.contextPath}/admin/rooms?action=delete&id=${room.roomId}" class="btn btn-sm btn-danger" onclick="return confirm('Bạn có chắc chắn muốn xóa phòng này không?');">Xóa</a>
         </td>
       </tr>
     </c:forEach>

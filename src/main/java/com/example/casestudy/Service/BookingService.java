@@ -14,4 +14,5 @@ public interface BookingService {
     boolean updateBooking(Booking booking) throws SQLException;
     boolean updateBookingStatus(int bookingId, String status) throws SQLException;
     void deleteBookingById(int bookingId) throws SQLException;
+    boolean checkRoomCurrentlyBooked(int roomId, java.util.Date today) throws SQLException;
 }

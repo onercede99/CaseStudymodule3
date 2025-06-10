@@ -18,7 +18,8 @@ public class AdminLoginServlet extends HttpServlet {
 
     @Override
     public void init() throws ServletException {
-        adminService = new AdminServiceImpl();
+        this.adminService = new AdminServiceImpl();
+        System.out.println("AdminLoginServlet: AdminService initialized.");
     }
 
     @Override

@@ -17,26 +17,19 @@
     </div>
   </div>
 </footer>
-
-<%-- Bootstrap JS Bundle (bao gồm Popper) --%>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<%-- File script.js chung của bạn (nếu có) --%>
-<%-- <script src="${pageContext.request.contextPath}/js/script.js"></script> --%>
 
 <script>
   document.addEventListener('DOMContentLoaded', function() {
-    // Cập nhật năm hiện tại cho footer
     const currentYearSpan = document.getElementById('currentYearFooter');
     if (currentYearSpan) {
       currentYearSpan.textContent = new Date().getFullYear();
     }
 
-    // --- JS cho date picker TRONG THANH TÌM KIẾM CỦA HEADER ---
-    var headerCheckInInput = document.getElementById('checkIn'); // ID từ header
-    var headerCheckOutInput = document.getElementById('checkOut'); // ID từ header
+    var headerCheckInInput = document.getElementById('checkIn');
+    var headerCheckOutInput = document.getElementById('checkOut');
 
     if (headerCheckInInput) {
-      // Không set min ở đây nữa vì đã có trong HTML, chỉ xử lý logic 'change'
       headerCheckInInput.addEventListener('change', function() {
         if (headerCheckInInput.value) {
           var checkInDateObj = new Date(headerCheckInInput.value);
@@ -60,7 +53,6 @@
           }
         }
       });
-      // Xử lý khi trang load lại với giá trị checkIn đã có trong header
       if (headerCheckInInput.value && headerCheckOutInput) {
         var checkInDateObj = new Date(headerCheckInInput.value);
         checkInDateObj.setDate(checkInDateObj.getDate() + 1);
@@ -71,9 +63,6 @@
         headerCheckOutInput.setAttribute('min', minCheckoutDate);
       }
     }
-
-
-    // --- JS cho date picker TRONG FORM TÌM KIẾM CỦA HERO SECTION ---
     var heroCheckInInput = document.getElementById('heroCheckIn');
     var heroCheckOutInput = document.getElementById('heroCheckOut');
 
@@ -101,7 +90,6 @@
           }
         }
       });
-      // Xử lý khi trang load lại với giá trị heroCheckIn đã có
       if (heroCheckInInput.value && heroCheckOutInput) {
         var heroCheckInDateObj = new Date(heroCheckInInput.value);
         heroCheckInDateObj.setDate(heroCheckInDateObj.getDate() + 1);
@@ -114,5 +102,6 @@
     }
   });
 </script>
+
 </body>
 </html>

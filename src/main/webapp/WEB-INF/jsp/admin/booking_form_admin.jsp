@@ -13,6 +13,41 @@
   </style>
 </head>
 <body>
+<h2>Thêm đặt phòng mới (Admin)</h2>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-3">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="${pageContext.request.contextPath}/admin/rooms">Admin Panel</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#adminNavbar" aria-controls="adminNavbar" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="adminNavbar">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <li>
+          <hr class="nav-item">
+          <a href="${pageContext.request.contextPath}/" target="_blank">
+            <i class="fas fa-home"></i> Về Trang Chủ
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link active" aria-current="page" href="${pageContext.request.contextPath}/admin/rooms">Quản lý Phòng</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="${pageContext.request.contextPath}/admin/bookings">Quản lý Đặt phòng</a>
+        </li>
+      </ul>
+      <ul class="navbar-nav">
+        <li class="nav-item" style="align-content: center">
+                         <span class="navbar-text me-3">
+                             Chào, <c:out value="${sessionScope.adminUser.username}"/>!
+                         </span>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="${pageContext.request.contextPath}/admin/logout">Đăng xuất</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
 <div class="container">
   <h1 class="mb-4">${formAction == 'insert' ? 'Thêm Đặt Phòng Mới' : 'Chỉnh Sửa Đặt Phòng'}</h1>
 

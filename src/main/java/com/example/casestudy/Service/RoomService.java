@@ -15,5 +15,7 @@ public interface RoomService {
     boolean updateRoom(Room room)  throws SQLException;
     boolean deleteRoom(int roomId)   throws SQLException;
     boolean isRoomAvailable(int roomId,  Date checkInDate, Date checkOutDate)  throws SQLException;
+    boolean checkRoomNumberExists(String roomNumber) throws SQLException;
+
 
 }

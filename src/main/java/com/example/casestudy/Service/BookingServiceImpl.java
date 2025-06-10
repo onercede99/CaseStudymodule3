@@ -12,14 +12,18 @@ import java.util.List;
 public class BookingServiceImpl implements BookingService {
     private RoomService roomService;
 
+    public void setRoomService(RoomService roomService) {
+        System.out.println("BookingServiceImpl: setRoomService called with " + (roomService != null ? "valid RoomService" : "NULL RoomService"));
+        this.roomService = roomService;
+    }
+
     public BookingServiceImpl() {
-        this.roomService = new RoomServiceImpl();
+        System.out.println("BookingServiceImpl: Constructor called.");
     }
 
     @Override
     public boolean createBooking(Booking booking) throws SQLException {
-        RoomService roomService = new RoomServiceImpl();
-        if(!roomService.isRoomAvailable(booking.getRoomId(),booking.getCheckInDate(),booking.getCheckOutDate())){
+        if(!this.roomService.isRoomAvailable(booking.getRoomId(),booking.getCheckInDate(),booking.getCheckOutDate())){
             System.err.println("Attempt to book an unavailable room or overlapping dates for room_id: " + booking.getRoomId());
             return false;
         }
@@ -29,8 +33,8 @@ public class BookingServiceImpl implements BookingService {
             stmt.setInt(1, booking.getRoomId());
             stmt.setString(2, booking.getGuestName());
             stmt.setString(3, booking.getGuestEmail());
-            stmt.setDate(4, (Date) booking.getCheckInDate());
-            stmt.setDate(5, (Date) booking.getCheckOutDate());
+            stmt.setDate(4, new java.sql.Date(booking.getCheckInDate().getTime()));
+            stmt.setDate(5, new java.sql.Date(booking.getCheckOutDate().getTime()));
             stmt.setBigDecimal(6, booking.getTotalPrice());
             stmt.setString(7, booking.getStatus() != null ? booking.getStatus() : "confirmed");
             int affectedRows = stmt.executeUpdate();
@@ -38,6 +42,8 @@ public class BookingServiceImpl implements BookingService {
                 try(ResultSet rs = stmt.getGeneratedKeys()){
                     if(rs.next()){
                         booking.setBookingId(rs.getInt(1));
+                    } else {
+                        System.err.println("Booking created but failed to retrieve generated ID.");
                     }
                 }
                 return true;
@@ -178,8 +184,16 @@ public class BookingServiceImpl implements BookingService {
         return booking;
     }
     public static long calculateNights(LocalDate checkIn, LocalDate checkOut){
-        if(checkIn == null || checkOut == null || checkIn.isBefore(checkIn) || checkOut.isEqual(checkIn)){
+        if(checkIn == null || checkOut == null ){
+            System.err.println("calculateNights: Check-in or check-out date is null.");
             return 0;
+        }
+        if (checkOut.isBefore(checkIn)) {
+            System.err.println("calculateNights: Check-out date is before check-in date.");
+            return 0;
+        }
+        if (checkOut.isEqual(checkIn)) {
+            return 1;
         }
         return ChronoUnit.DAYS.between(checkIn, checkOut);
     }
@@ -202,5 +216,30 @@ public class BookingServiceImpl implements BookingService {
             System.err.println("Lỗi khi xóa đặt phòng: " + e.getMessage());
             throw e;
         }
+    }
+    @Override
+    public boolean checkRoomCurrentlyBooked(int roomId, java.util.Date todayUtil) throws SQLException {
+        if (todayUtil == null) {
+            return false;
+        }
+        java.sql.Date todaySql = new java.sql.Date(todayUtil.getTime());
+
+        String sql = "SELECT COUNT(*) FROM bookings " +
+                "WHERE room_id = ? " +
+                "AND status NOT IN ('CANCELLED', 'CHECKED_OUT') " +
+                "AND ? >= check_in_date " +
+                "AND ? < check_out_date";
+        try (Connection conn = DatabaseUtil.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, roomId);
+            stmt.setDate(2, todaySql);
+            stmt.setDate(3, todaySql);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0;
+                }
+            }
+        }
+        return false;
     }
 }
