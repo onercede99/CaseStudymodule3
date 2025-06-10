@@ -10,7 +10,7 @@
 
   <p class="lead">
     <c:choose>
-      <c:when test="${not empty errorMessage}"> <%-- Ưu tiên errorMessage từ Servlet --%>
+      <c:when test="${not empty errorMessage}">
         ${errorMessage}
       </c:when>
       <c:when test="${not empty requestScope['javax.servlet.error.message']}">

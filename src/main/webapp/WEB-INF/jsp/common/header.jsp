@@ -74,43 +74,6 @@
         </div>
     </div>
 </nav>
-
-<%--<c:if test='${pageContext.request.servletPath != "/" && pageContext.request.servletPath != "/index.jsp"}'>--%>
-<%--<div class="search-bar-custom">--%>
-<%--    <div class="container">--%>
-<%--        <form action="${pageContext.request.contextPath}/rooms" method="GET" class="row g-3 align-items-end">--%>
-<%--            <div class="col-md-4">--%>
-<%--                <label for="destination" class="form-label">Điểm đến hoặc tên khách sạn</label>--%>
-<%--                <input type="text" class="form-control" id="destination" name="destination" value="${param.destination}" placeholder="Ví dụ: Hà Nội, Đà Nẵng">--%>
-<%--            </div>--%>
-<%--            <div class="col-md-2">--%>
-<%--                <label for="checkIn" class="form-label">Ngày nhận phòng</label>--%>
-<%--                <input type="date" class="form-control" id="checkIn" name="checkIn" value="${param.checkIn}" min="<%= java.time.LocalDate.now().toString() %>">--%>
-<%--            </div>--%>
-<%--            <div class="col-md-2">--%>
-<%--                <label for="checkOut" class="form-label">Ngày trả phòng</label>--%>
-<%--                <input type="date" class="form-control" id="checkOut" name="checkOut" value="${param.checkOut}" min="<%= java.time.LocalDate.now().plusDays(1).toString() %>">--%>
-<%--            </div>--%>
-<%--            <div class="col-md-2">--%>
-<%--                <label for="guests" class="form-label">Số khách</label>--%>
-<%--                <select class="form-select" id="guests" name="guests">--%>
-<%--                    <option value="1" ${param.guests == '1' ? 'selected' : ''}>1 người</option>--%>
-<%--                    <option value="2" ${empty param.guests || param.guests == '2' ? 'selected' : ''}>2 người</option>--%>
-<%--                    <option value="3" ${param.guests == '3' ? 'selected' : ''}>3 người</option>--%>
-<%--                    <option value="4" ${param.guests == '4' ? 'selected' : ''}>4 người</option>--%>
-<%--                    <option value="5" ${param.guests == '5' ? 'selected' : ''}>5+ người</option>--%>
-<%--                </select>--%>
-<%--            </div>--%>
-<%--            <div class="col-md-2">--%>
-<%--                <button type="submit" class="btn btn-warning w-100">--%>
-<%--                    <i class="fas fa-search"></i> Tìm--%>
-<%--                </button>--%>
-<%--            </div>--%>
-<%--        </form>--%>
-<%--    </div>--%>
-<%--</div>--%>
-<%--</c:if>--%>
-
 <div class="container mt-3">
     <c:if test="${not empty sessionScope.successMessage}">
         <div class="alert alert-success alert-dismissible fade show" role="alert">

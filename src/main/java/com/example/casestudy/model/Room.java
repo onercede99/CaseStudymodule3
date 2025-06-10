@@ -10,7 +10,7 @@ public class Room {
     private String description;
     private String imageUrl;
     private boolean available;
-    private int capacity; // <-- THUỘC TÍNH MỚI
+    private int capacity;
 
     public Room() {
     }
@@ -33,10 +33,9 @@ public class Room {
         this.description = description;
         this.imageUrl = imageUrl;
         this.available = available;
-        this.capacity = capacity; // Gán giá trị capacity
+        this.capacity = capacity;
     }
 
-    // Constructor để tạo phòng mới (không có roomId, có capacity)
     public Room(String roomNumber, String roomType, BigDecimal pricePerNight, String description, String imageUrl, boolean available, int capacity) {
         this.roomNumber = roomNumber;
         this.roomType = roomType;
@@ -48,7 +47,6 @@ public class Room {
     }
 
 
-    // Getters and Setters
     public int getRoomId() { return roomId; }
     public void setRoomId(int roomId) { this.roomId = roomId; }
 

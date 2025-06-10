@@ -86,7 +86,7 @@ public class AdminBookingServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String action = request.getParameter("action");
         if (action == null) {
-            response.sendRedirect(request.getContextPath() + "/admin/bookings"); // Nếu không có action, quay lại danh sách
+            response.sendRedirect(request.getContextPath() + "/admin/bookings");
             return;
         }
         request.setCharacterEncoding("UTF-8");
@@ -190,7 +190,7 @@ public class AdminBookingServlet extends HttpServlet {
         BigDecimal totalPrice = null;
         if (totalPriceStr != null && !totalPriceStr.trim().isEmpty()) {
             try {
-                totalPrice = new BigDecimal(totalPriceStr.trim().replace(",", "")); // Thêm replace(",", "") nếu người dùng có thể nhập dấu phẩy
+                totalPrice = new BigDecimal(totalPriceStr.trim().replace(",", ""));
                 if (totalPrice.compareTo(BigDecimal.ZERO) < 0) {
                     request.setAttribute("errorMessage", "Tổng tiền không thể là số âm.");
                     loadFormDataAndForwardForError(request, response, roomIdStr, guestName, guestEmail, checkInDateStr, checkOutDateStr, totalPriceStr, status, "insert");
@@ -207,8 +207,7 @@ public class AdminBookingServlet extends HttpServlet {
             return;
         }
 
-        // Validate và parse roomId
-        int roomId = -1; // Giá trị mặc định không hợp lệ
+        int roomId = -1;
         if (roomIdStr == null || roomIdStr.trim().isEmpty()) {
             request.setAttribute("errorMessage", "Vui lòng chọn một phòng.");
             loadFormDataAndForwardForError(request, response, roomIdStr, guestName, guestEmail, checkInDateStr, checkOutDateStr, totalPriceStr, status, "insert");
@@ -216,14 +215,13 @@ public class AdminBookingServlet extends HttpServlet {
         }
         try {
             roomId = Integer.parseInt(roomIdStr.trim());
-            System.out.println("Admin insertBooking - Parsed roomId: " + roomId); // LOG 2
+            System.out.println("Admin insertBooking - Parsed roomId: " + roomId);
         } catch (NumberFormatException e) {
             request.setAttribute("errorMessage", "Mã phòng không hợp lệ.");
             loadFormDataAndForwardForError(request, response, roomIdStr, guestName, guestEmail, checkInDateStr, checkOutDateStr, totalPriceStr, status, "insert");
             return;
         }
 
-        // Validate checkInDateStr và checkOutDateStr (đã có)
         if (checkInDateStr == null || checkInDateStr.trim().isEmpty() ||
                 checkOutDateStr == null || checkOutDateStr.trim().isEmpty()) {
             request.setAttribute("errorMessage", "Ngày nhận và trả phòng là bắt buộc.");
@@ -232,7 +230,7 @@ public class AdminBookingServlet extends HttpServlet {
         }
 
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        java.util.Date utilCheckInDate; // Đổi tên để rõ ràng là java.util.Date
+        java.util.Date utilCheckInDate;
         java.util.Date utilCheckOutDate;
         try {
             utilCheckInDate = dateFormat.parse(checkInDateStr);
@@ -265,8 +263,6 @@ public class AdminBookingServlet extends HttpServlet {
         }
         newBooking.setRoomId(roomId);
 
-        // Set các thuộc tính cho newBooking
-        // Các setter trong Booking.java phải chấp nhận java.util.Date nếu bạn truyền utilCheckInDate
         newBooking.setCheckInDate(utilCheckInDate);
         newBooking.setCheckOutDate(utilCheckOutDate);
         newBooking.setTotalPrice(totalPrice);
@@ -282,8 +278,8 @@ public class AdminBookingServlet extends HttpServlet {
                 ", Status=" + newBooking.getStatus()); // LOG 4
 
         boolean success = bookingService.createBooking(newBooking);
-        System.out.println("Admin insertBooking - bookingService.createBooking result: " + success); // LOG 5
-        System.out.println("Admin insertBooking - Booking ID after create (if updated by service): " + newBooking.getBookingId()); // LOG 6
+        System.out.println("Admin insertBooking - bookingService.createBooking result: " + success);
+        System.out.println("Admin insertBooking - Booking ID after create (if updated by service): " + newBooking.getBookingId());
 
 
         if (success) {
@@ -320,7 +316,7 @@ public class AdminBookingServlet extends HttpServlet {
                                                 String checkInDateStr, String checkOutDateStr,
                                                 String totalPriceStr, String status, String formAction, Booking bookingInProgress)
             throws ServletException, IOException, SQLException {
-        request.setAttribute("booking", bookingInProgress); // Truyền đối tượng booking đang xử lý
+        request.setAttribute("booking", bookingInProgress);
         loadFormDataAndForwardForError(request, response, roomIdStr, guestName, guestEmail, checkInDateStr, checkOutDateStr, totalPriceStr, status, formAction);
     }
 

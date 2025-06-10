@@ -22,11 +22,8 @@
     </button>
     <div class="collapse navbar-collapse" id="adminNavbar">
       <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-        <li>
-          <hr class="nav-item">
-          <a href="${pageContext.request.contextPath}/" target="_blank">
-            <i class="fas fa-home"></i> Về Trang Chủ
-          </a>
+        <li class="nav-item">
+          <a class="nav-link active" aria-current="page" href="${pageContext.request.contextPath}/">Về Trang Chủ</a>
         </li>
         <li class="nav-item">
           <a class="nav-link active" aria-current="page" href="${pageContext.request.contextPath}/admin/rooms">Quản lý Phòng</a>
@@ -36,11 +33,6 @@
         </li>
       </ul>
       <ul class="navbar-nav">
-        <li class="nav-item" style="align-content: center">
-                         <span class="navbar-text me-3">
-                             Chào, <c:out value="${sessionScope.adminUser.username}"/>!
-                         </span>
-        </li>
         <li class="nav-item">
           <a class="nav-link" href="${pageContext.request.contextPath}/admin/logout">Đăng xuất</a>
         </li>

@@ -5,11 +5,10 @@ import java.sql.Timestamp;
 public class Admin {
     private int id;
     private String username;
-    private String passwordHash; // Sẽ là password plain text nếu bạn chưa hash
+    private String passwordHash;
     private String fullName;
     private Timestamp createdAt;
 
-    // Constructors
     public Admin() {
     }
 

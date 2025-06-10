@@ -42,7 +42,7 @@
             <p class="lead-text">Khám phá và đặt ngay những phòng khách sạn tuyệt vời nhất cho kỳ nghỉ đáng nhớ của bạn.</p>
 
             <div class="search-form-container-hero">
-                <form action="${pageContext.request.contextPath}/rooms" method="GET">
+                <form action="${pageContext.request.contextPath}/room_list" method="GET">
                     <div class="row g-3 align-items-end">
                         <div class="col-lg-3 col-md-6">
                             <label for="heroDestination" class="form-label">Điểm đến</label>
@@ -66,7 +66,9 @@
                             </select>
                         </div>
                         <div class="col-lg-3 col-md-12">
-                            <button type="submit"  class="btn btn-warning w-100"><i class="fas fa-search"></i> TÌM KIẾM NGAY</button>
+                            <button type="submit" class="btn btn-warning w-100" style="height: 50px;">
+                                TÌM KIẾM NGAY
+                            </button>
                         </div>
                     </div>
                 </form>

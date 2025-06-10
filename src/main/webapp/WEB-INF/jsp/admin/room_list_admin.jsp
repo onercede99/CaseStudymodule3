@@ -33,11 +33,8 @@
       </button>
       <div class="collapse navbar-collapse" id="adminNavbar">
         <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-          <li>
-            <hr class="nav-item">
-            <a href="${pageContext.request.contextPath}/" target="_blank">
-              <i class="fas fa-home"></i> Về Trang Chủ
-            </a>
+          <li class="nav-item">
+            <a class="nav-link active" aria-current="page" href="${pageContext.request.contextPath}/">Về Trang Chủ</a>
           </li>
           <li class="nav-item">
             <a class="nav-link active" aria-current="page" href="${pageContext.request.contextPath}/admin/rooms">Quản lý Phòng</a>
@@ -47,11 +44,6 @@
           </li>
         </ul>
         <ul class="navbar-nav">
-          <li class="nav-item" style="align-content: center">
-                         <span class="navbar-text me-3">
-                             Chào, <c:out value="${sessionScope.adminUser.username}"/>!
-                         </span>
-          </li>
           <li class="nav-item">
             <a class="nav-link" href="${pageContext.request.contextPath}/admin/logout">Đăng xuất</a>
           </li>
@@ -105,7 +97,7 @@
         <td><c:out value="${room.description}"/></td>
         <td>
           <c:if test="${not empty room.imageUrl}">
-            <img src="${room.imageUrl}" class="card-img-top" alt="Ảnh phòng ${room.roomNumber}"
+            <img src="${room.imageUrl}" class="card-img-top" alt="Ảnh phòng ${room.roomNumber}" style="width: 80px; height: 60px; object-fit: cover; border-radius: 4px;"
                  onerror="this.onerror=null; this.src='${pageContext.request.contextPath}/images/placeholder.png'; this.alt='Lỗi tải ảnh';">
           </c:if>
           <c:if test="${empty room.imageUrl}">
@@ -121,8 +113,8 @@
           </c:if>
         </td>
         <td>
-          <a href="${pageContext.request.contextPath}/admin/rooms?action=edit&id=${room.roomId}" class="btn btn-sm btn-primary">Sửa</a>
-          <a href="${pageContext.request.contextPath}/admin/rooms?action=delete&id=${room.roomId}" class="btn btn-sm btn-danger" onclick="return confirm('Bạn có chắc chắn muốn xóa phòng này không?');">Xóa</a>
+          <a href="${pageContext.request.contextPath}/admin/rooms?action=edit&id=${room.roomId}" class="btn btn-sm btn-primary"><i class="fas fa-edit"></i>Sửa</a>
+          <a href="${pageContext.request.contextPath}/admin/rooms?action=delete&id=${room.roomId}" class="btn btn-sm btn-danger" onclick="return confirm('Bạn có chắc chắn muốn xóa phòng này không?');"><i class="fas fa-trash-alt"></i>Xóa</a>
         </td>
       </tr>
     </c:forEach>
